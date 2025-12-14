@@ -1,8 +1,8 @@
 
 import React from 'react';
 import { LoanParams, CalculationResult } from '../types';
-import { Input, Select } from './ui/Input';
-import { DollarSign, Percent, Calendar, Shield, Clock, Layers, TrendingDown, History } from 'lucide-react';
+import { Input, Select, FormattedNumberInput } from './ui/Input';
+import { DollarSign, Percent, Calendar, Shield, Clock, Layers, TrendingDown, History, ArrowRightLeft } from 'lucide-react';
 
 interface Props {
   params: LoanParams;
@@ -26,6 +26,11 @@ export const CalculatorForm: React.FC<Props> = ({ params, onChange, result }) =>
     onChange({ ...params, [field]: value });
   };
 
+  const handleRateChange = (value: number) => {
+      // Force rateType to monthly when user inputs here, just in case
+      onChange({ ...params, rateValue: value, rateType: 'monthly' });
+  };
+
   // Helper to find current balance based on paid installments
   const getCurrentBalance = () => {
       if (params.paidInstallments === 0) return params.amount;
@@ -36,9 +41,12 @@ export const CalculatorForm: React.FC<Props> = ({ params, onChange, result }) =>
 
   const currentBalance = getCurrentBalance();
   const maxTerm = params.termUnit === 'years' ? params.term * 12 : params.term;
+  
+  // Calculate TEA for display
+  const calculatedTEA = (Math.pow(1 + params.rateValue / 100, 12) - 1) * 100;
 
   return (
-    <div className="space-y-4 pb-24"> {/* Padding bottom for sticky nav */}
+    <div className="space-y-4"> 
       
       <div className="bg-white p-5 rounded-2xl shadow-sm border border-gray-100 space-y-4">
         <h2 className="text-lg font-bold text-slate-800 flex items-center gap-2">
@@ -46,11 +54,10 @@ export const CalculatorForm: React.FC<Props> = ({ params, onChange, result }) =>
            Préstamo
         </h2>
         
-        <Input
+        <FormattedNumberInput
           label="Monto del Préstamo"
-          type="number"
           value={params.amount}
-          onChange={(e) => handleChange('amount', Number(e.target.value))}
+          onChange={(val) => handleChange('amount', val)}
           icon={<span className="text-gray-400 font-bold">$</span>}
           placeholder="0.00"
         />
@@ -58,23 +65,27 @@ export const CalculatorForm: React.FC<Props> = ({ params, onChange, result }) =>
         <div className="grid grid-cols-2 gap-4">
             <div className="col-span-1">
                 <Input
-                label="Tasa (%)"
-                type="number"
-                step="0.01"
-                value={params.rateValue}
-                onChange={(e) => handleChange('rateValue', Number(e.target.value))}
-                icon={<Percent className="w-4 h-4" />}
+                    label="Tasa Mensual (TEM %)"
+                    type="number"
+                    step="0.01"
+                    value={params.rateValue}
+                    onChange={(e) => handleRateChange(Number(e.target.value))}
+                    icon={<Percent className="w-4 h-4" />}
                 />
             </div>
             <div className="col-span-1">
-                <Select
-                    label="Tipo de Tasa"
-                    value={params.rateType}
-                    onChange={(e) => handleChange('rateType', e.target.value as 'monthly' | 'annual')}
-                >
-                    <option value="monthly">Mensual (TEM)</option>
-                    <option value="annual">Anual (TEA)</option>
-                </Select>
+                 <div className="flex flex-col gap-1 opacity-90">
+                    <label className="text-xs font-semibold text-gray-500 uppercase tracking-wide ml-1 flex items-center gap-1">
+                        Equivalente TEA
+                    </label>
+                    <div className="relative w-full bg-slate-50 text-slate-700 border border-gray-200 rounded-xl px-4 py-3 font-bold flex items-center shadow-sm">
+                        <span className="text-slate-900">{calculatedTEA.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
+                        <Percent className="w-3 h-3 ml-1 text-gray-400" />
+                        <div className="absolute right-3 top-1/2 -translate-y-1/2">
+                             <ArrowRightLeft className="w-4 h-4 text-brand-300" />
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
 
@@ -128,17 +139,16 @@ export const CalculatorForm: React.FC<Props> = ({ params, onChange, result }) =>
              <div className="mt-3 flex justify-between items-end">
                 <div className="text-[10px] text-gray-500">Saldo Capital Pendiente:</div>
                 <div className="text-lg font-bold text-slate-900">
-                    {currentBalance.toLocaleString('es-ES', { style: 'currency', currency: 'USD' })}
+                    {currentBalance.toLocaleString('en-US', { style: 'currency', currency: 'USD' })}
                 </div>
              </div>
         </div>
 
         <div className="grid grid-cols-2 gap-4">
-            <Input
+            <FormattedNumberInput
                 label="Abono Extra a Capital"
-                type="number"
                 value={params.extraPaymentAmount}
-                onChange={(e) => handleChange('extraPaymentAmount', Number(e.target.value))}
+                onChange={(val) => handleChange('extraPaymentAmount', val)}
                 icon={<span className="text-green-500 font-bold">$</span>}
                 placeholder="0"
                 helperText="Monto adicional directo a deuda"
@@ -209,11 +219,10 @@ export const CalculatorForm: React.FC<Props> = ({ params, onChange, result }) =>
             icon={<Percent className="w-4 h-4" />}
         />
 
-        <Input
+        <FormattedNumberInput
             label="Comisión Fija Mensual"
-            type="number"
             value={params.fixedFee}
-            onChange={(e) => handleChange('fixedFee', Number(e.target.value))}
+            onChange={(val) => handleChange('fixedFee', val)}
             icon={<span className="text-gray-400 font-bold">$</span>}
         />
 

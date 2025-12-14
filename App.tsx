@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect, useMemo } from 'react';
 import { LoanParams, AppTab } from './types';
 import { calculateSchedule } from './services/financialMath';
@@ -13,8 +14,8 @@ const App: React.FC = () => {
   // Default State
   const [params, setParams] = useState<LoanParams>({
     amount: 10000,
-    rateType: 'annual',
-    rateValue: 15,
+    rateType: 'monthly', // Changed to monthly as primary input
+    rateValue: 1.5,      // Representative monthly rate (approx 19.5% TEA)
     term: 12,
     termUnit: 'months',
     gracePeriod: 0,
@@ -36,9 +37,9 @@ const App: React.FC = () => {
     switch (activeTab) {
       case AppTab.CALCULATOR:
         return (
-          <div className="animate-fade-in">
-            <SummaryCard result={result} />
+          <div className="animate-fade-in space-y-4 pb-24">
             <CalculatorForm params={params} onChange={setParams} result={result} />
+            <SummaryCard result={result} />
           </div>
         );
       case AppTab.SCHEDULE:

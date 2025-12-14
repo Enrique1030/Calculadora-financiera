@@ -33,7 +33,8 @@ export const ScheduleTable: React.FC<Props> = ({ schedule, startDate, paidInstal
                 <th className="px-4 py-3 text-right">Pago Total</th>
                 <th className="px-4 py-3 text-right text-brand-600">Capital</th>
                 <th className="px-4 py-3 text-right text-orange-500">Interés</th>
-                <th className="px-4 py-3 text-right text-gray-400">Seg+Com</th>
+                <th className="px-4 py-3 text-right text-purple-500">Seguro</th>
+                <th className="px-4 py-3 text-right text-gray-500">Comisión</th>
                 <th className="px-4 py-3 text-right">Saldo</th>
               </tr>
             </thead>
@@ -60,7 +61,7 @@ export const ScheduleTable: React.FC<Props> = ({ schedule, startDate, paidInstal
                         {isPaid && <span className="ml-2 text-[9px] bg-gray-200 text-gray-600 px-1 rounded uppercase font-bold">Pagado</span>}
                     </td>
                     <td className="px-4 py-3 text-right font-bold text-slate-900">
-                        {row.payment.toLocaleString('es-ES', { style: 'currency', currency: 'USD' })}
+                        {row.payment.toLocaleString('en-US', { style: 'currency', currency: 'USD' })}
                         {isExtra && (
                             <div className="text-[9px] text-green-600 font-bold flex justify-end items-center gap-1">
                                 <Zap className="w-2 h-2"/> Incl. extra
@@ -68,16 +69,19 @@ export const ScheduleTable: React.FC<Props> = ({ schedule, startDate, paidInstal
                         )}
                     </td>
                     <td className="px-4 py-3 text-right text-brand-600">
-                        {row.amortization.toLocaleString('es-ES', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                        {row.amortization.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                     </td>
                     <td className="px-4 py-3 text-right text-orange-500">
-                        {row.interest.toLocaleString('es-ES', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                        {row.interest.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                     </td>
-                    <td className="px-4 py-3 text-right text-gray-400">
-                        {(row.insurance + row.fee).toLocaleString('es-ES', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                    <td className="px-4 py-3 text-right text-purple-500">
+                        {row.insurance.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                    </td>
+                     <td className="px-4 py-3 text-right text-gray-500">
+                        {row.fee.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                     </td>
                     <td className="px-4 py-3 text-right font-medium text-slate-600">
-                        {row.balance.toLocaleString('es-ES', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                        {row.balance.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                     </td>
                     </tr>
                 );

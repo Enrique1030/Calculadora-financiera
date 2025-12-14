@@ -1,7 +1,8 @@
 
-import { LoanParams, PaymentRow, CalculationResult } from '../types';
+import { LoanParams, PaymentRow, CalculationResult, ScenarioMetrics } from '../types';
 
-export const calculateSchedule = (params: LoanParams): CalculationResult => {
+// Internal function to perform the calculation logic
+const calculateInternal = (params: LoanParams): CalculationResult => {
   const { 
     amount, rateType, rateValue, term, termUnit, 
     gracePeriod, graceType, graceDays, insurance, fixedFee,
@@ -185,4 +186,50 @@ export const calculateSchedule = (params: LoanParams): CalculationResult => {
       newTerm: actualLastPeriod
     }
   };
+};
+
+export const calculateSchedule = (params: LoanParams): CalculationResult => {
+    // 1. Calculate the requested scenario (what the user selected)
+    const result = calculateInternal(params);
+
+    // 2. Calculate Comparison Scenarios if extra payment is active
+    if (params.extraPaymentAmount > 0) {
+        // A. Original (No Extra Payment)
+        const originalRes = calculateInternal({ ...params, extraPaymentAmount: 0 });
+        const originalMetrics: ScenarioMetrics = {
+            totalPayment: originalRes.summary.totalPayment,
+            totalInterest: originalRes.summary.totalInterest,
+            term: originalRes.summary.newTerm || params.term,
+            regularPayment: originalRes.summary.firstPayment,
+            savings: 0
+        };
+
+        // B. Reduce Term Strategy
+        const termRes = calculateInternal({ ...params, extraPaymentStrategy: 'reduce_term' });
+        const reduceTermMetrics: ScenarioMetrics = {
+            totalPayment: termRes.summary.totalPayment,
+            totalInterest: termRes.summary.totalInterest,
+            term: termRes.summary.newTerm || params.term,
+            regularPayment: termRes.summary.regularPayment,
+            savings: originalRes.summary.totalPayment - termRes.summary.totalPayment
+        };
+
+        // C. Reduce Quota Strategy
+        const quotaRes = calculateInternal({ ...params, extraPaymentStrategy: 'reduce_quota' });
+        const reduceQuotaMetrics: ScenarioMetrics = {
+            totalPayment: quotaRes.summary.totalPayment,
+            totalInterest: quotaRes.summary.totalInterest,
+            term: quotaRes.summary.newTerm || params.term,
+            regularPayment: quotaRes.summary.regularPayment,
+            savings: originalRes.summary.totalPayment - quotaRes.summary.totalPayment
+        };
+
+        result.summary.comparison = {
+            original: originalMetrics,
+            reduceTerm: reduceTermMetrics,
+            reduceQuota: reduceQuotaMetrics
+        };
+    }
+
+    return result;
 };

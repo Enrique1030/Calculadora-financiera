@@ -30,6 +30,14 @@ export interface PaymentRow {
   extraPayment?: number; // Visual indicator for extra payment
 }
 
+export interface ScenarioMetrics {
+    totalPayment: number;
+    totalInterest: number;
+    term: number;
+    regularPayment: number; // The ongoing monthly payment
+    savings: number;
+}
+
 export interface CalculationResult {
   schedule: PaymentRow[];
   startDate: string; // Formatted disbursement date
@@ -41,6 +49,13 @@ export interface CalculationResult {
     firstPayment: number; // The original scheduled payment
     regularPayment: number; // The current/final scheduled payment
     newTerm?: number; // Actual term if reduced
+    
+    // Comparison Scenarios
+    comparison?: {
+        original: ScenarioMetrics;
+        reduceTerm: ScenarioMetrics;
+        reduceQuota: ScenarioMetrics;
+    };
   };
 }
 

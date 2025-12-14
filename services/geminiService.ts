@@ -2,36 +2,37 @@
 import { GoogleGenAI } from "@google/genai";
 import { CalculationResult, LoanParams } from "../types";
 
-const SYSTEM_INSTRUCTION = `Act as an expert financial advisor. Your goal is to analyze loan details provided by the user. 
-Provide a concise, mobile-friendly analysis.
-1. Evaluate if the Annual Rate (TEA) is competitive (assume standard consumer market context).
-2. Highlight the impact of the grace period (especially if capitalized) and insurance costs.
-3. Give a clear verdict: "Favorable", "Neutral", or "Expensive".
-4. Provide 2 actionable tips to reduce interest.
-Format using Markdown. Keep it short (under 200 words).`;
+const SYSTEM_INSTRUCTION = `Actúa como un asesor financiero experto. Tu objetivo es analizar los detalles del préstamo proporcionados por el usuario.
+Proporciona un análisis conciso y optimizado para lectura en móvil.
+1. Evalúa si la Tasa Efectiva Anual (TEA) es competitiva (asumiendo un contexto de mercado de consumo estándar).
+2. Resalta el impacto del periodo de gracia (especialmente si es capitalizable) y los costos del seguro.
+3. Da un veredicto claro: "Favorable", "Neutral" o "Costoso".
+4. Proporciona 2 consejos accionables para reducir el pago de intereses.
+Usa formato Markdown. Mantén la respuesta breve (menos de 200 palabras).
+RESPONDE SIEMPRE EN ESPAÑOL.`;
 
 export const getFinancialAdvice = async (params: LoanParams, result: CalculationResult): Promise<string> => {
   try {
     const apiKey = process.env.API_KEY;
     if (!apiKey) {
-        return "Error: API Key is missing. Please check your environment configuration.";
+        return "Error: Falta la API Key. Por favor verifica tu configuración.";
     }
 
     const ai = new GoogleGenAI({ apiKey });
 
     const prompt = `
-    Please analyze this loan scenario:
-    - Loan Amount: ${params.amount}
-    - Term: ${params.term} ${params.termUnit}
-    - Annual Effective Rate (TEA): ${(result.summary.annualRate * 100).toFixed(2)}%
-    - Monthly Rate (TEM): ${(result.summary.monthlyRate * 100).toFixed(2)}%
-    - Total Interest Payable: ${result.summary.totalInterest.toFixed(2)}
-    - Total Cost of Loan: ${result.summary.totalPayment.toFixed(2)}
-    - Grace Period: ${params.gracePeriod} months (${params.graceType === 'total' ? 'Capitalized/Total' : 'Interest Only/Partial'})
-    - Grace Days: ${params.graceDays} days (Capitalized)
-    - Insurance/Fees included.
+    Por favor analiza este escenario de préstamo:
+    - Monto del Préstamo: ${params.amount}
+    - Plazo: ${params.term} ${params.termUnit}
+    - Tasa Anual (TEA): ${(result.summary.annualRate * 100).toFixed(2)}%
+    - Tasa Mensual (TEM): ${(result.summary.monthlyRate * 100).toFixed(2)}%
+    - Interés Total a Pagar: ${result.summary.totalInterest.toFixed(2)}
+    - Costo Total del Préstamo: ${result.summary.totalPayment.toFixed(2)}
+    - Periodo de Gracia: ${params.gracePeriod} meses (${params.graceType === 'total' ? 'Capitalizable (Total)' : 'Solo Interés (Parcial)'})
+    - Días de Gracia: ${params.graceDays} días
+    - Seguros y Comisiones incluidos en el cálculo.
     
-    Is this a good financial decision for a personal loan? Note any risks with the grace period type selected.
+    ¿Es esta una buena decisión financiera para un préstamo personal? Menciona cualquier riesgo específico.
     `;
 
     const response = await ai.models.generateContent({
@@ -42,7 +43,7 @@ export const getFinancialAdvice = async (params: LoanParams, result: Calculation
       }
     });
 
-    return response.text || "No analysis available.";
+    return response.text || "No hay análisis disponible en este momento.";
   } catch (error) {
     console.error("Gemini API Error:", error);
     return "Lo siento, no pude conectar con el asesor financiero de IA en este momento.";
