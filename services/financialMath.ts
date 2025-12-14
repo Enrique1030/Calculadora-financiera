@@ -4,7 +4,7 @@ import { LoanParams, PaymentRow, CalculationResult, ScenarioMetrics } from '../t
 // Internal function to perform the calculation logic
 const calculateInternal = (params: LoanParams): CalculationResult => {
   const { 
-    amount, rateType, rateValue, term, termUnit, 
+    amount, startDate: startDateString, rateType, rateValue, term, termUnit, 
     gracePeriod, graceType, graceDays, insurance, fixedFee,
     extraPaymentAmount, extraPaymentMonth, extraPaymentStrategy
   } = params;
@@ -63,7 +63,11 @@ const calculateInternal = (params: LoanParams): CalculationResult => {
   const schedule: PaymentRow[] = [];
   let totalInterest = 0;
   let totalPaymentAccumulator = 0;
-  const startDate = new Date();
+  
+  // Parse Start Date accurately respecting local time
+  const [year, month, day] = startDateString.split('-').map(Number);
+  // Note: Month in Date constructor is 0-indexed (0=Jan, 11=Dec)
+  const startDate = new Date(year, month - 1, day);
   
   // Track actual final period for summary
   let actualLastPeriod = 0;

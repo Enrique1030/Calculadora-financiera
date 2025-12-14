@@ -6,8 +6,9 @@ const SYSTEM_INSTRUCTION = `Actúa como un asesor financiero experto. Tu objetiv
 Proporciona un análisis conciso y optimizado para lectura en móvil.
 1. Evalúa si la Tasa Efectiva Anual (TEA) es competitiva (asumiendo un contexto de mercado de consumo estándar).
 2. Resalta el impacto del periodo de gracia (especialmente si es capitalizable) y los costos del seguro.
-3. Da un veredicto claro: "Favorable", "Neutral" o "Costoso".
-4. Proporciona 2 consejos accionables para reducir el pago de intereses.
+3. Observa la fecha de desembolso para identificar si es un préstamo histórico o una proyección futura.
+4. Da un veredicto claro: "Favorable", "Neutral" o "Costoso".
+5. Proporciona 2 consejos accionables para reducir el pago de intereses.
 Usa formato Markdown. Mantén la respuesta breve (menos de 200 palabras).
 RESPONDE SIEMPRE EN ESPAÑOL.`;
 
@@ -23,6 +24,7 @@ export const getFinancialAdvice = async (params: LoanParams, result: Calculation
     const prompt = `
     Por favor analiza este escenario de préstamo:
     - Monto del Préstamo: ${params.amount}
+    - Fecha de Desembolso: ${params.startDate}
     - Plazo: ${params.term} ${params.termUnit}
     - Tasa Anual (TEA): ${(result.summary.annualRate * 100).toFixed(2)}%
     - Tasa Mensual (TEM): ${(result.summary.monthlyRate * 100).toFixed(2)}%

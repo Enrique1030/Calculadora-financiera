@@ -1,17 +1,18 @@
 
 import React from 'react';
 import { PaymentRow } from '../types';
-import { ArrowDownCircle, ArrowUpCircle, Calendar, Zap, CheckCircle2 } from 'lucide-react';
+import { Zap, CheckCircle2 } from 'lucide-react';
 
 interface Props {
   schedule: PaymentRow[];
   startDate: string;
   paidInstallments?: number;
+  className?: string;
 }
 
-export const ScheduleTable: React.FC<Props> = ({ schedule, startDate, paidInstallments = 0 }) => {
+export const ScheduleTable: React.FC<Props> = ({ schedule, startDate, paidInstallments = 0, className = "pb-24" }) => {
   return (
-    <div className="pb-24">
+    <div className={className}>
       <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
         <div className="p-4 bg-gray-50 border-b border-gray-100 flex justify-between items-center">
             <div>

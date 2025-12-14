@@ -6,14 +6,24 @@ import { CalculatorForm } from './components/CalculatorForm';
 import { ScheduleTable } from './components/ScheduleTable';
 import { SummaryCard } from './components/SummaryCard';
 import { AdvisorView } from './components/AdvisorView';
-import { Calculator, CalendarDays, BrainCircuit } from 'lucide-react';
+import { Calculator, CalendarDays, Sparkles } from 'lucide-react';
 
 const App: React.FC = () => {
   const [activeTab, setActiveTab] = useState<AppTab>(AppTab.CALCULATOR);
   
+  // Helper to get local date string YYYY-MM-DD
+  const getTodayString = () => {
+    const d = new Date();
+    const year = d.getFullYear();
+    const month = String(d.getMonth() + 1).padStart(2, '0');
+    const day = String(d.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
+  };
+
   // Default State
   const [params, setParams] = useState<LoanParams>({
     amount: 10000,
+    startDate: getTodayString(), // Uses local time correctly
     rateType: 'monthly', // Changed to monthly as primary input
     rateValue: 1.5,      // Representative monthly rate (approx 19.5% TEA)
     term: 12,
@@ -39,7 +49,7 @@ const App: React.FC = () => {
         return (
           <div className="animate-fade-in space-y-4 pb-24">
             <CalculatorForm params={params} onChange={setParams} result={result} />
-            <SummaryCard result={result} />
+            <SummaryCard result={result} params={params} />
           </div>
         );
       case AppTab.SCHEDULE:
@@ -121,10 +131,10 @@ const App: React.FC = () => {
            <button
             onClick={() => setActiveTab(AppTab.ADVISOR)}
             className={`flex flex-col items-center justify-center w-full h-full transition-colors ${
-              activeTab === AppTab.ADVISOR ? 'text-indigo-600' : 'text-gray-400 hover:text-gray-600'
+              activeTab === AppTab.ADVISOR ? 'text-slate-800' : 'text-gray-400 hover:text-gray-600'
             }`}
           >
-            <BrainCircuit className={`w-6 h-6 mb-1 ${activeTab === AppTab.ADVISOR ? 'fill-indigo-100' : ''}`} />
+            <Sparkles className={`w-6 h-6 mb-1 ${activeTab === AppTab.ADVISOR ? 'fill-slate-200 text-amber-500' : ''}`} />
             <span className="text-[10px] font-medium">IA Advisor</span>
           </button>
         </div>

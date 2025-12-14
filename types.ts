@@ -1,6 +1,7 @@
 
 export interface LoanParams {
   amount: number;
+  startDate: string; // YYYY-MM-DD
   rateType: 'monthly' | 'annual';
   rateValue: number; // Percentage
   term: number; // Months

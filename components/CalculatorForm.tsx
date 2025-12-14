@@ -54,13 +54,27 @@ export const CalculatorForm: React.FC<Props> = ({ params, onChange, result }) =>
            Préstamo
         </h2>
         
-        <FormattedNumberInput
-          label="Monto del Préstamo"
-          value={params.amount}
-          onChange={(val) => handleChange('amount', val)}
-          icon={<span className="text-gray-400 font-bold">$</span>}
-          placeholder="0.00"
-        />
+        {/* Row for Amount and Date */}
+        <div className="grid grid-cols-2 gap-4">
+            <div>
+                <FormattedNumberInput
+                    label="Monto"
+                    value={params.amount}
+                    onChange={(val) => handleChange('amount', val)}
+                    icon={<span className="text-gray-400 font-bold">$</span>}
+                    placeholder="0.00"
+                />
+            </div>
+            <div>
+                 <Input
+                    label="Desembolso"
+                    type="date"
+                    value={params.startDate}
+                    onChange={(e) => handleChange('startDate', e.target.value)}
+                    className="text-sm"
+                />
+            </div>
+        </div>
 
         <div className="grid grid-cols-2 gap-4">
             <div className="col-span-1">
